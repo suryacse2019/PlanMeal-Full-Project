@@ -1,0 +1,894 @@
+@php
+use App\Helpers\Helper;
+$role = Helper::role_slug();
+@endphp
+
+<x-app-layout>
+    <form action="{{ route('ingredient.update', $ingredient->id) }}" method="POST" class="needs-validation"
+        id="form_data" enctype="multipart/form-data" novalidate="">
+        @csrf
+        {{ method_field('PUT') }}
+        <div class="col-sm-12">
+            @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <div class="card">
+                <div class="card-header pb-0">
+                    <h5>Edit ingredient</h5>
+                </div>
+
+
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <input class="form-control" id="ingredient_name" type="text" name="ingredient_name"
+                                placeholder="Ingredient Name" value="{{ $ingredient->name }}" required="">
+                            <div class="invalid-feedback">Please Insert Ingredient Name</div>
+                            @error('ingredient_name')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+
+                        <div class="col-md-4">
+                            <input class="form-control" id="ingredient_hindi" type="text" name="ingredient_hindi"
+                                placeholder="Name in Hindi" value="{{ $ingredient->also_known }}" required="">
+                            <div class="invalid-feedback">Please Insert Ingre</div>
+                            @error('ingredient_hindi')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="input-group">
+                                <input class="form-control" id="known_as" name="known_as" type="text"
+                                    value="{{ $ingredient->also_known }}" placeholder="known as"
+                                    aria-describedby="inputGroupPrepend" required="">
+                                <div class="invalid-feedback">Please choose .</div>
+                            </div>
+                            @error('known_as')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+
+                    @if ($role != 'content-editor')
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                @if (!empty($categorylist))
+                                    <select class="form-select" id="category" name="Category" required="">
+                                        <option value="">Category</option>
+                                        @foreach ($categorylist as $category)
+                                            @php
+                                                $selected = '';
+                                                if ($category->id == $ingredient->category) {
+                                                    $selected = 'selected';
+                                                }
+                                            @endphp
+                                            <option value="{{ $category->id }}" {{ $selected }}>
+                                                {{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
+                                @endif
+                                <div class="invalid-feedback">Please select a valid Category.</div>
+                                @error('Category')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+
+
+                            <div class="col-md-3">
+                                <select class="form-select" id="food_group" name="food_group" required="">
+                                    <option value="">Food Group</option>
+                                    @if (!empty($food_group))
+                                        @foreach ($food_group as $foodgroup)
+                                            @php
+                                                $selected = '';
+                                                if ($foodgroup->id == $ingredient->food_group) {
+                                                    $selected = 'selected';
+                                                }
+                                            @endphp
+                                            <option value="{{ $foodgroup->id }}" {{ $selected }}>
+                                                {{ $foodgroup->name }}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+
+                                <div class="invalid-feedback">Please select a valid Food Group.</div>
+                                @error('food_group')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+
+
+                            <div class="col-md-2">
+                                <input class="form-control" id="slug" type="text" name="slug" placeholder="slug"
+                                    value="{{ $ingredient->url_rewrite }}" required="">
+                                <div class="invalid-feedback">PLease insert the slug</div>
+                                @error('slug')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-2">
+
+                                <select class="form-select" id="directly_eatable" name="directly_eatable"
+                                    required="">
+                                    <option value="">Directly eatable</option>
+                                    <option value="1" {{ $ingredient->directly_edible == '1' ? 'selected' : '' }}>Yes
+                                    </option>
+                                    <option value="0" {{ $ingredient->directly_edible == '0' ? 'selected' : '' }}>No
+                                    </option>
+
+                                </select>
+                                <div class="invalid-feedback">Please select a option.</div>
+                                @error('directly_eatable')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+
+
+                            <div class="col-md-2">
+                                @if (!empty($MealDatabaselist))
+                                    <select class="form-select" id="database" name="database" required="">
+                                        <option selected="" disabled="" value="">Database(India,US,etc)</option>
+                                        @foreach ($MealDatabaselist as $MealDatabase)
+                                            @php
+                                                $selected = '';
+                                                if ($MealDatabase->id == $ingredient->database_id) {
+                                                    $selected = 'selected';
+                                                }
+                                            @endphp
+                                            <option {{ $selected }} value="{{ $MealDatabase->id }}">
+                                                {{ $MealDatabase->database_name }}</option>
+                                        @endforeach
+                                    </select>
+                                @endif
+                                <div class="invalid-feedback">Please select a option.</div>
+                                @error('database')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <textarea class="form-control" required="" placeholder="How to store" value="" id="exampleFormControlTextarea1"
+                                        name="how_to_store" rows="3">{{ $ingredient->storage }}</textarea>
+                                </div>
+
+                                <div class="invalid-feedback">Please enter text</div>
+                                @error('how_to_store')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <textarea class="form-control" placeholder="Slug Life" name="shelf_life" value="" id="exampleFormControlTextarea1"
+                                        required="" rows="3">{{ $ingredient->shelf_life }}</textarea>
+                                </div>
+                                @error('shelf_life')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                @if (!empty($Measurementlist))
+                                    @php
+                                        
+                                        if ($ingredient->parameter != '') {
+                                            $mparameter = explode(',', $ingredient->parameter);
+                                        }
+                                    @endphp
+                                    <select class="js-example-basic-multiple form-control"
+                                        data-placeholder="Select Measurement units" name="measurement[]"
+                                        id="measurement" multiple="multiple">
+
+
+                                        @foreach ($Measurementlist as $Measurement)
+                                            @php
+                                                $selected = '';
+                                                
+                                                if (!empty($mparameter) && in_array($Measurement->id, $mparameter)) {
+                                                    $selected = 'selected';
+                                                }
+                                                
+                                            @endphp
+                                            <option {{ $selected }} value="{{ $Measurement->id }}">
+                                                {{ $Measurement->unit }}</option>
+                                        @endforeach
+                                    </select>
+                                @endif
+                                <div class="invalid-feedback">Please select a valid Food Group.</div>
+                                @error('measurement')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                @if (!empty($AllergyCategorylist))
+
+                                    <select class="js-example-basic-multiple form-control"
+                                        data-placeholder="Allergies if any" name="allergies[]" id="allergies"
+                                        multiple="multiple">
+
+                                        @foreach ($AllergyCategorylist as $AllergyCategory)
+                                            @php
+                                                $selected = '';
+                                                if ($AllergyCategory->id == $ingredient->is_healthy) {
+                                                    $selected = 'selected';
+                                                }
+                                            @endphp
+                                            <option {{ $selected }} value="{{ $AllergyCategory->id }}">
+                                                {{ $AllergyCategory->name }}</option>
+                                        @endforeach
+                                    </select>
+                                @endif
+                                <div class="invalid-feedback">Please select a valid Food Group.</div>
+                                @error('allergies')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-3">
+                                @if (!empty($Ayur_Veda))
+                                    <select class="js-example-basic-multiple form-control" data-placeholder="Ayurveda"
+                                        name="Ayurveda[]" id="Ayurveda" multiple="multiple">
+
+
+                                        @foreach ($Ayur_Veda as $AyurVeda)
+                                            @php
+                                                $selected = '';
+                                                if ($foodgroup->id == $ingredient->ayurveda_type) {
+                                                    $selected = 'selected';
+                                                }
+                                            @endphp
+                                            <option {{ $selected }} value="{{ $AyurVeda->id }}">
+                                                {{ $AyurVeda->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @endif
+                                <div class="invalid-feedback">Please select a valid Ayurveda.</div>
+                                @error('Ayurveda')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-3">
+                                <img src="{{ asset('storage/' . $ingredient->image) }}" height="50px" width="100px">
+                                <input class="form-control" id="images" type="file" name="images"
+                                    placeholder="Change Image" value="" required="">
+
+                                <div class="invalid-feedback">Please Choose File</div>
+                                @error('images')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+
+
+                            <div class="col-md-6">
+                                @if (!empty($mealdiseaseslist))
+
+                                    <select class="js-example-basic-multiple form-control" data-placeholder="Avoid It"
+                                        name="avoidit[]" id="avoid_it" multiple="multiple">
+                                        @foreach ($mealdiseaseslist as $mealdiseases)
+                                            @if (!empty($mealdiseases))
+                                                @php
+                                                    $selected = '';
+                                                    if (!empty($mmidisease->disease_id)) {
+                                                        if ($mealdiseases->id == $mmidisease->disease_id) {
+                                                            $selected = 'selected';
+                                                        }
+                                                    }
+                                                @endphp
+                                                <option {{ $selected }} value="{{ $mealdiseases->id }}">
+                                                    {{ $mealdiseases->name }}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                @endif
+                                <div class="invalid-feedback">Please select a valid Food Group.</div>
+                            </div>
+                        </div>
+
+                        <div class="card-header pb-0">
+                            <h5>Measurement</h5>
+                        </div>
+                        @if (!empty($ingdmeasurelist))
+                            @foreach ($ingdmeasurelist as $ingdmeasure)
+                                <div class="row g-3 pt-3" id="mesure_{{ $ingdmeasure->measurement_id }}">
+                                    <div class="col-md-2">
+
+                                        @foreach ($Measurementlist as $Measurement)
+                                            @if ($Measurement->id == $ingdmeasure->measurement_id)
+                                                <input class="form-control" id="" type="text" disable name=""
+                                                    placeholder="" value="{{ $Measurement->unit }}">
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                    <div class="col-md-2">
+
+                                        <input class="form-control" id="" type="text" name="" placeholder="value"
+                                            value="{{ $ingdmeasure->measure }}">
+
+                                    </div>
+                                    <div class="col-md-2">
+
+                                        <input class="form-control" id="" type="text" name="" placeholder="value"
+                                            value="{{ $ingdmeasure->price }}">
+
+                                    </div>
+
+                                </div>
+                            @endforeach
+                        @endif
+
+
+                        <div id="measurementlist"></div>
+
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <div class="checkbox p-0">
+                                    <input class="form-check-input" id="invalidCheck" type="checkbox" required="">
+
+                                </div>
+
+                            </div>
+                        </div>
+
+
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="gram" type="number" name="gram"
+                                                    placeholder="Gram" value="{{ $ingredient->per_gram_serving }}">
+
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="calories" type="number" name="calories"
+                                                    placeholder="calories" value="{{ $ingredient->calories }}">
+
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="fat" type="number" name="fat"
+                                                    placeholder="Fat" value="{{ $ingredient->fats }}">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="carbs" type="number" name="carbs"
+                                                    placeholder="carbs" value="{{ $ingredient->carbs }}">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="protein" type="number" name="protein"
+                                                    placeholder="Protein" value="{{ $ingredient->protein }}">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" value="{{ $ingredient->fiber_in_gm }}"
+                                                    id="fiber" type="number" name="fiber" placeholder="Fiber">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-3 pt-3">
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="sodium"
+                                                    value="{{ $ingredient->sodium_in_mg }}" type="number" name="sodium"
+                                                    placeholder="sodium">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="potassium" type="number"
+                                                    name="potassium" value="{{ $ingredient->potassium }}"
+                                                    placeholder="potassium">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="cholestrol" type="number"
+                                                    name="cholestrol" placeholder="cholestrol"
+                                                    value="{{ $ingredient->cholesterol }}">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="water" type="number" name="water"
+                                                    placeholder="water%" value="{{ $ingredient->water }}">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="yeild" type="number" name="yeild"
+                                                    placeholder="yeild" value="{{ $ingredient->yield }}">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="sugar" type="number" name="sugar"
+                                                    placeholder="sugar" value="{{ $ingredient->sugar }}">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+                                        <div class="card-header pb-0">
+                                            <h5>Sugar</h5>
+                                        </div>
+
+                                        <div class="row g-3 pt-3">
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="sugar_G"
+                                                    value="{{ isset($sugar->sugar) ? $sugar->sugar : '' }}"
+                                                    type="number" name="sugar_G" placeholder="sugar G">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($sugar->sucrose) ? $sugar->sucrose : '' }}"
+                                                    id="sucrose_G" type="number" name="sucrose_G"
+                                                    placeholder="sucrose (G)">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="gulcose_g"
+                                                    value="{{ isset($sugar->glucose) ? $sugar->glucose : '' }}"
+                                                    type="number" name="gulcose_g" placeholder="Gulcose (G)">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="fructose_g"
+                                                    value="{{ isset($sugar->fructose) ? $sugar->fructose : '' }}"
+                                                    type="text" name="fructose_g" placeholder="Fructose(G)">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($sugar->lactose) ? $sugar->lactose : '' }}"
+                                                    id="lactose_g" type="number" name="lactose_g"
+                                                    placeholder="Lactose(G)">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($sugar->maltose) ? $sugar->maltose : '' }}"
+                                                    id="maltose_g" type="number" name="maltose_g"
+                                                    placeholder="Maltose(G)">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="row g-3 pt-3">
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($sugar->glactose) ? $sugar->glactose : '' }}"
+                                                    id="galactose_g" type="number" name="galactose_g"
+                                                    placeholder="Galactose(G)">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+
+                                            <div class="card-header pb-0">
+                                                <h5>Fat</h5>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="saturated_fat" type="number"
+                                                    name="saturated_fat"
+                                                    value="{{ isset($Fats->saturated_fat) ? $Fats->saturated_fat : '' }}"
+                                                    placeholder="Saturated_FAT">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($Fats->mono_unsaturated_fat) ? $Fats->mono_unsaturated_fat : '' }}"
+                                                    id="monounsaturated" type="number" name="monounsaturated"
+                                                    placeholder="Monounsaturated">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($Fats->poly_unsaturated_fat) ? $Fats->poly_unsaturated_fat : '' }}"
+                                                    id="polyunsaturated" type="number" name="polyunsaturated"
+                                                    placeholder="Polyunsaturated">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($Fats->trans_fat) ? $Fats->trans_fat : '' }}"
+                                                    id="trans_fat" type="number" name="trans_fat" placeholder="Trans FAT">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="omega_3_fatty"
+                                                    value="{{ isset($Fats->omega_3_fatty_acid) ? $Fats->omega_3_fatty_acid : '' }}"
+                                                    type="number" name="omega_3_fatty" placeholder="Omega 3 Fatty">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="row g-3 pt-3">
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($Fats->omega_6_fatty_acid) ? $Fats->omega_6_fatty_acid : '' }}"
+                                                    id="omega_6_fatty" type="number" name="omega_6_fatty"
+                                                    placeholder="Omega 6 Fatty">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+
+
+
+
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <div class="checkbox p-0">
+                                                        <input class="form-check-input" id="invalidCheck"
+                                                            type="checkbox" required="">
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-header pb-0">
+                                        Vitamins & Minerals
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="betaine"
+                                                    value="{{ isset($vitamins->betaine) ? $vitamins->betaine : '' }}"
+                                                    type="text" name="betaine" placeholder="Betaine(MG)">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($vitamins->betaine) ? $vitamins->betaine : '' }}"
+                                                    id="calcium" type="text" name="calcium"
+                                                    placeholder="Calcium(MG)">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($vitamins->copper) ? $vitamins->copper : '' }}"
+                                                    id="copper" type="text" name="copper"
+                                                    placeholder="Copper(MG)">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($vitamins->folate) ? $vitamins->folate : '' }}"
+                                                    id="folate" type="text" name="folate"
+                                                    placeholder="Folate(MG)">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="lycopene"
+                                                    value="{{ isset($vitamins->lycopene) ? $vitamins->lycopene : '' }}"
+                                                    type="text" name="lycopene" placeholder="Lycopene(MG)">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($vitamins->manganese) ? $vitamins->manganese : '' }}"
+                                                    id="manganese" type="text" name="manganese"
+                                                    placeholder="Manganese(MG)">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-3 pt-3">
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($vitamins->phosphorus) ? $vitamins->phosphorus : '' }}"
+                                                    id="phosphorus" type="text" name="phosphorus"
+                                                    placeholder="Phosphorus">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($vitamins->riboflavin) ? $vitamins->riboflavin : '' }}"
+                                                    id="reboflavin" type="text" name="reboflavin"
+                                                    placeholder="Reboflavin">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="vitamin_a" type="text"
+                                                    name="vitamin_a"
+                                                    value="{{ isset($vitamins->vitamin_a) ? $vitamins->vitamin_a : '' }}"
+                                                    placeholder="Vitamin A">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="vitamin_b"
+                                                    value="{{ isset($vitamins->vitamin_b6) ? $vitamins->vitamin_b6 : '' }}"
+                                                    type="text" name="vitamin_b6" placeholder="Vitamin B6">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="vitamin_c"
+                                                    value="{{ isset($vitamins->vitamin_c) ? $vitamins->vitamin_c : '' }}"
+                                                    type="text" name="vitamin_c" placeholder="Vitamin C">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="vitamin_d2"
+                                                    value="{{ isset($vitamins->vitamin_d2) ? $vitamins->vitamin_d2 : '' }}"
+                                                    type="text" name="vitamin_d2" placeholder="Vitamin D2">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-3 pt-3">
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="vitamin_d3"
+                                                    value="{{ isset($vitamins->vitamin_d3) ? $vitamins->vitamin_d3 : '' }}"
+                                                    type="text" name="vitamin_d3" placeholder="Vitamin D3">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="vitamin_e"
+                                                    value="{{ isset($vitamins->vitamin_e) ? $vitamins->vitamin_e : '' }}"
+                                                    type="text" name="vitamin_e" placeholder="Vitamin E">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="vitamin_b12"
+                                                    value="{{ isset($vitamins->vitamin_b12) ? $vitamins->vitamin_b12 : '' }}"
+                                                    type="text" name="vitamin_b12" placeholder="Vitamin B12">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="vitamin_k"
+                                                    value="{{ isset($vitamins->vitamin_k) ? $vitamins->vitamin_k : '' }}"
+                                                    type="text" name="vitamin_k" placeholder="Vitamin K">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="choline"
+                                                    value="{{ isset($vitamins->choline) ? $vitamins->choline : '' }}"
+                                                    type="text" name="choline" placeholder="Choline">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($vitamins->fluoride) ? $vitamins->fluoride : '' }}"
+                                                    id="fluride" type="text" name="fluride"
+                                                    placeholder="Fluride">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="row g-3 pt-3">
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($vitamins->iron) ? $vitamins->iron : '' }}"
+                                                    id="iron" type="text" name="iron" placeholder="Iron">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($vitamins->magnesium) ? $vitamins->magnesium : '' }}"
+                                                    id="magnesium" type="text" name="magnesium"
+                                                    placeholder="Magnesium">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($vitamins->niacin) ? $vitamins->niacin : '' }}"
+                                                    id="niacin" type="text" name="niacin" placeholder="Niacin">
+
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="retinol"
+                                                    value="{{ isset($vitamins->retinol) ? $vitamins->retinol : '' }}"
+                                                    type="text" name="retinol" placeholder="Retinol">
+
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="thiamin"
+                                                    value="{{ isset($vitamins->thiamine) ? $vitamins->thiamine : '' }}"
+                                                    type="text" name="thiamine" placeholder="Thiamin">
+
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" id="selenium"
+                                                    value="{{ isset($vitamins->selenium) ? $vitamins->selenium : '' }}"
+                                                    type="text" name="selenium" placeholder="Selenium">
+
+                                            </div>
+                                        </div>
+
+
+                                        <div class="row g-3 pt-3">
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($vitamins->zinc) ? $vitamins->zinc : '' }}"
+                                                    id="zinc" type="text" name="zinc" placeholder="Zinc">
+
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($vitamins->vitamin_d) ? $vitamins->vitamin_d : '' }}"
+                                                    id="vitamin_d" type="text" name="vitamin_d"
+                                                    placeholder="Vitamin D">
+
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control"
+                                                    value="{{ isset($vitamins->caffeine) ? $vitamins->caffeine : '' }}"
+                                                    id="caffeine" type="text" name="caffeine"
+                                                    placeholder="Caffeine">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if ($role != 'nutrient')
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-header pb-0">
+                                        <h5>Long Description</h5>
+                                    </div>
+                                    <div class="row">
+
+                                        <textarea id="long_desc" name="long_desc">{{ $ingredient->description }}</textarea>
+
+                                    </div>
+
+                                    <div class="card-header pb-0">
+                                        <h5>Short Description</h5>
+                                    </div>
+                                    <div class="row">
+
+                                        <textarea id="short_desc" name="short_desc"></textarea>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                
+                </div>
+
+                <div class="card-footer">
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+
+    @push('extra_script')
+        <script src="{{ asset('assets/js/form-wizard/form-wizard-three.js') }}"></script>
+        <script src="{{ asset('assets/js/form-wizard/jquery.backstretch.min.js') }}"></script>
+
+        <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/simple-mde.css') }}">
+
+        <!-- Plugins JS start-->
+        <script src="{{ asset('assets/js/editor/simple-mde/simplemde.min.js') }}"></script>
+        <!-- Plugins JS Ends-->
+        <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/select2.css') }}">
+        <script src="{{ asset('assets/js/select2/select2.full.min.js') }}"></script>
+        <!-- Plugin used-->
+
+        <script type="text/javascript">
+            var slug = function(str) {
+                str = str.replace(/^\s+|\s+$/g, ''); // trim
+                str = str.toLowerCase();
+
+                // remove accents, swap ñ for n, etc
+                var from = "ãàáäâẽèéëêìíïîõòóöôùúüûñç·/_,:;";
+                var to = "aaaaaeeeeeiiiiooooouuuunc------";
+                for (var i = 0, l = from.length; i < l; i++) {
+                    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+                }
+
+                str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+                    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+                    .replace(/-+/g, '-'); // collapse dashes
+
+                return str;
+            };
+
+            $(document.body).on("change", "#ingredient_name", function() {
+                $("#slug").val(slug($(this).val()));
+            });
+
+
+
+            (function($) {
+                var simplemde = new SimpleMDE({
+                    element: $("#short_desc")[0]
+                });
+                var simplemde1 = new SimpleMDE({
+                    element: $("#long_desc")[0]
+                });
+                //var simplemde2 = new SimpleMDE({ element: $("#instruction")[0] });
+            })(jQuery);
+
+
+            $('#measurement').on('select2:select', function(e) {
+                var dparams = e.params.data;
+                // var ing_id = dparams.id;
+
+                var html = '<div class="row g-3 pt-3" id="mesure_' + dparams.id + '">' +
+                    '<div class="col-md-2">' +
+                    '  <input class="form-control" id="mesure_unit" type="hidden" name="mesure_unit[]" disable value="' +
+                    dparams.id + '" >' + dparams.text +
+                    '<div class="invalid-feedback">mesurment name required</div>' +
+                    '</div>' +
+                    '<div class="col-md-2">' +
+                    '  <input class="form-control" id="mesure_value" type="number" name="mesure_value[]" placeholder="value" >' +
+                    '  <div class="valid-feedback"></div>' +
+                    '</div>' +
+
+                    '<div class="col-md-2">' +
+                    '  <input class="form-control" id="mesure_value" type="number" name="price[]" placeholder="price" >' +
+                    '  <div class="valid-feedback"></div>' +
+                    '</div>' +
+                    '</div>';
+
+                $('#measurementlist').append(html);
+
+
+            });
+
+
+            $('#measurement').on('select2:unselect', function(e) {
+                var dparams = e.params.data;
+                $('#mesure_' + dparams.id).remove();
+            });
+
+
+            $(document).ready(function() {
+                $('.js-example-basic-multiple').select2();
+            });
+
+
+
+            "use strict";
+            (function() {
+                'use strict';
+                window.addEventListener('load', function() {
+                    var forms = document.getElementsByClassName('needs-validation');
+                    var validation = Array.prototype.filter.call(forms, function(form) {
+                        form.addEventListener('submit', function(event) {
+                            consloe.log(form.checkValidity());
+                            if (form.checkValidity() === false) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+                            form.classList.add('was-validated');
+                        }, false);
+                    });
+                }, false);
+            })();
+        </script>
+    @endpush
+
+</x-app-layout>
